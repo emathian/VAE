@@ -49,6 +49,8 @@ model.eval()
 # prediction file
 out_file = 'front_best_model_vae_Biggest_BN.csv'
 out_file2 = 'Vectors2.csv'
+out_filemu =  'MuDist.csv'
+out_file_logvar = 'LogVar.csv'
 anomality = list()
 filenames = []
 
@@ -68,6 +70,8 @@ with torch.no_grad():
             output = output[0]
         elif model_type in ['vae']: # , 'vqvae'
             output = output[0]
+            mu =   output[1]
+            logvar = output[2]
         if model_type in ['fcn','fcn_b']:
             loss = eval_loss(output, img).sum(-1)
         else:
@@ -75,6 +79,22 @@ with torch.no_grad():
         with open(out_file, 'a') as f1:
             f1.write('{}\t{}\n'.format(filename[0], loss))
         f1.close()
-        with open(out_file2, 'a') as f2:
-            f2.write('{}\t{}\n'.format(filename[0], output.detach().cpu().numpy().flatten()))
-        f2.close()
+
+        flatten = output.detach().cpu().numpy().flatten()
+        flatten =  flatten.reshape(1,flatten.shape[0])
+        c_pd =  pd.DataFrame(data=flatten, index=[filename[0]])
+        print(c_pd)
+        c_pd.to_csv(out_file2, mode='a', header=False)
+
+        mu = mu.detach().cpu().numpy().flatten()
+        mu =  flatten.reshape(1,mu.shape[0])
+        c_pd =  pd.DataFrame(data=mu, index=[filename[0]])
+        print(c_pd)
+        c_pd.to_csv(out_filemu, mode='a', header=False)
+
+
+        logvar = logvar.detach().cpu().numpy().flatten()
+        logvar =  logvar.reshape(1,logvar.shape[0])
+        c_pd =  pd.DataFrame(data=logvar, index=[filename[0]])
+        print(c_pd)
+        c_pd.to_csv(out_file_logvar, mode='a', header=False)
