@@ -1,0 +1,12 @@
+TNE*/
+TNE*
+runs/
+runs
+*.out
+*.csv
+*.txt
+*.pt
+__pycache__
+__pycache__/
+.*
+.*/
